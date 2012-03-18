@@ -1,0 +1,3 @@
+[submodule "vendor/Autoloader"]
+	path = vendor/Autoloader
+	url = git://github.com/prestaconcept/Autoloader.git
