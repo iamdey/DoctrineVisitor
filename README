@@ -1,0 +1,59 @@
+# Mise en application du Patron Visiteur avec Doctrine
+
+Il est question de voir comment mettre en application 
+le patron de conception (Design Pattern) Visiteur (Visitor) 
+ceci à travers Doctrine2 et d'expliquer pourquoi ce choix.
+
+## Le Visiteur
+
+En quelques mots : ce motif de conception permet de faire évoluer une classe
+sans pour autant modifier sa structure interne. 
+
+D'autres l'expliqueront bien mieux que moi seul sur Wikipedia http://fr.wikipedia.org/wiki/Visiteur_%28motif_de_conception%29
+
+## L'implémentation
+
+C'est au final assez simple, Doctrine2 est quand me assez génial pour ça.
+C'est un peu un retour aux sources de la POO, on réalise la modélisation 
+d'un système de classe, puis l'orm vient se greffer dessus; pas l'inverse!
+Il n'est donc pas nécessaire de brancher la DBAL tout de suite pour illustrer l'exemple qui suit.
+
+En définitive on aura : Le controller et son action faisant office de client (\Controller\Client::action()).
+Celui-ci chargera comme à son habitude l'entité Livre (\Entity\Book) 
+et il s'occupera aussi d'instancier le visiteur pour au final executer ses méthodes.
+Il suffira alors d'ajouter les méthodes ''accept'' et ''visit'' aux bons endroits.
+
+
+## Bien choisir les motifs
+
+En réalité cet exemple pourrait être utilisé avec au moins 3 autres motifs de conception, le résultat serait le même.
+
+Ce que nous voulons dans tous les cas, c'est que le code de la méthode 
+Reader\BookVisitor::read() ne se retrouve pas dans la classe Entity\book().
+
+ * Avec un cas particulier : la fabrique (Factory) :
+
+À mon avis La fabrique (http://fr.wikipedia.org/wiki/Fabrique_%28patron_de_conception%29)
+et trop liée à Doctrine. Ça signifie en gros qu'il inutile d'esperer réaliser une Fabrique simple
+à partir du moment où l'on veut persister les objets en base.
+Doctrine2 s'occupe tout seul d'instancier la bonne classe 
+grâce au système d'héritage (http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/inheritance-mapping.html)
+et il le fait bien (enfin c'est relatif).
+
+ * Le décorateur (Decorator) (http://fr.wikipedia.org/wiki/D%C3%A9corateur_%28patron_de_conception%29)
+ * L'adapteur (Adapter) (http://fr.wikipedia.org/wiki/Adaptateur_%28patron_de_conception%29)
+
+
+Le visiteur semble être la solution "pas la moins pire et même plutôt pas mal".
+
+L'idée derrière la méthode read() est de fournir un traitement pour un element "exterieur" : le lecteur. 
+C'est pour cette raison que le Factory peut être écarté, 
+on l'utilisera plutôt pour créer des instances de "Livre de poche". 
+
+Dans l'action de lire, le lecteur a une interraction à double sens avec le livre : 
+le lecteur tourne une page puis le livre affiche de nouveaux paragraphes.
+Cette fois c'est le décorateur que l'on met de coté car il est à sens unique : 
+On va par contre l'utiliser pour rendre le contenu en html ou en texte brut.
+
+En gros tout dépend de l'interprétation que l'on donne dans notre modélisation. 
+(Coup d'épée dans l'eau)
